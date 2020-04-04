@@ -82,6 +82,10 @@ namespace MElib {
 		static int thread_update(SceSize args, void* argp);
 		void Update();
 
+		bool forceCPU;
+
+		SceUID thread_id;
+
 		bool m_async;
 		bool m_priority;
 		bool m_dynamic;
