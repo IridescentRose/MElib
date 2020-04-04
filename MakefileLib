@@ -1,6 +1,7 @@
 TARGET = LibME
 OBJS = src/me.o \
-src/MediaEngine.o
+src/MediaEngine.o \
+src/melib.o \
 
 alib = lib/libME.a
 

@@ -31,3 +31,6 @@
 *.app
 *.elf
 *.PBP
+
+# Build artifacts
+*.bat
