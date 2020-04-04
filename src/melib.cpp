@@ -1,6 +1,6 @@
 #include <melib.h>
 #include <driver/me.h>
-
+#include <malloc.h>
 #include <pspkernel.h>
 
 volatile me_struct* mei;
@@ -16,20 +16,16 @@ namespace MElib {
 	JobManager g_JobManager;
 
 	JobManager::JobManager() {
-		m_async = false;
 		m_priority = false;
 		m_dynamic = false;
 		isExecuting = false;
-		cpu_time = 0;
-		me_time = 0;
-		dynaMap.clear();
 		lastTick = 0;
 		jobQueue.clear();
 		forceCPU = false;
 	}
 
 	void JobManager::Init(ManagerInfo info) {
-		int ret = pspSdkLoadStartModule(path, PSP_MEMORY_PARTITION_KERNEL);
+		int ret = pspSdkLoadStartModule("./mediaengine.prx", PSP_MEMORY_PARTITION_KERNEL);
 
 		if (ret < 0) {
 			forceCPU = true;
@@ -51,6 +47,9 @@ namespace MElib {
 
 		sceRtcGetCurrentTick(&lastTick);
 		tickResolution = sceRtcGetTickResolution();
+
+		m_priority = info.priorityQueue;
+		m_dynamic = info.dynamicRebalancing;
 	}
 
 	void JobManager::Cleanup() {
@@ -67,7 +66,56 @@ namespace MElib {
 
 	void JobManager::Update() {
 
+		float jbCPULoad = 0.0f;
+		float jbMELoad = 0.0f;
 
+		for (auto job : jobQueue) {
+			//Execute job
+			isExecuting = true;
+
+			int endMode = job->jobInfo.execMode;
+			if (m_dynamic && !forceCPU) {
+				sceRtcGetCurrentTick(&lastTick);
+
+				if (endMode == MELIB_EXEC_DEFAULT) {
+					if (jbCPULoad >= jbMELoad) {
+						endMode = MELIB_EXEC_ME;
+					}
+					else {
+						endMode = MELIB_EXEC_CPU;
+					}
+				}
+			}
+
+
+			if (job->jobInfo.execMode == MELIB_EXEC_CPU || forceCPU) {
+				job->function(job->data);
+				sceKernelDelayThread(400); //Give a "breather" time
+			}
+			else {
+				BeginME(mei, (int)job->function, (int)job->data, -1, NULL, -1, NULL);
+				while(!CheckME(mei))
+					sceKernelDelayThread(100); //Poll for it
+			}
+
+			//Done
+			isExecuting = false;
+
+			if (m_dynamic && !forceCPU) {
+				u64 temp = lastTick;
+				sceRtcGetCurrentTick(&lastTick);
+				float dt = (double)(lastTick - temp) / ((double)tickResolution);
+				if (endMode == MELIB_EXEC_CPU) {
+					jbCPULoad += dt;
+				}
+				else {
+					jbMELoad += dt;
+				}
+			}
+
+			delete job;
+		}
+		
 
 		//Delay till the next frame
 		sceKernelDelayThread(16 * 1000);
@@ -75,7 +123,7 @@ namespace MElib {
 
 	int JobManager::thread_update(SceSize args, void* argp) {
 		while (true) {
-			g_JobManager->Update();
+			g_JobManager.Update();
 		}
 	}
 

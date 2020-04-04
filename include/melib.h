@@ -9,8 +9,8 @@
 * The mode of execution for a specific job.
 */
 #define MELIB_EXEC_DEFAULT	0x0 /** Executes on the ME, unless Dynamic Rebalancing is turned on */
-#define MELIB_EXEC_CPU		0x1 /**  Executes specifically on the main CPU, regardless of job mode */
-#define MELIB_EXEC_ME		0x2 /** Executes specifically on the Media Engine, regardless of job mode */
+#define MELIB_EXEC_CPU		0x1 /**  Executes specifically on the main CPU, regardless of job mode. Always runs synchronously (gives a small delay between jobs).*/
+#define MELIB_EXEC_ME		0x2 /** Executes specifically on the Media Engine, regardless of job mode. Always runs asynchronously.*/
 
 /**
 * Importance of the job.
@@ -38,7 +38,6 @@ namespace MElib {
 	* Given the properties in this structure, the manager will execute accordingly.
 	*/
 	struct ManagerInfo {
-		bool asynchronous; /** This setting determines whether or not the JobManager waits for the job to finish or if the main CPU can continue execution */
 		bool priorityQueue; /** This setting determines whether or not the JobManager will prioritize higher priority or lower priority tasks */
 		bool dynamicRebalancing; /** This setting determines whether or not the JobManager will try to balance system load */
 	};
@@ -86,14 +85,9 @@ namespace MElib {
 
 		SceUID thread_id;
 
-		bool m_async;
 		bool m_priority;
 		bool m_dynamic;
 		bool isExecuting;
-
-		std::map<int, float> dynaMap;
-		float cpu_time;
-		float me_time;
 
 		u32 tickResolution;
 		u64 lastTick;
