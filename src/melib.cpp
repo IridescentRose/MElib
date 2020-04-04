@@ -49,6 +49,8 @@ namespace MElib {
 
 		m_priority = info.priorityQueue;
 		m_dynamic = info.dynamicRebalancing;
+
+		sceKernelStartThread(thread_id, NULL, NULL);	
 	}
 
 	void JobManager::Cleanup() {
