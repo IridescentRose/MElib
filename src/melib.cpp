@@ -20,7 +20,6 @@ namespace MElib {
 		m_dynamic = false;
 		isExecuting = false;
 		lastTick = 0;
-		jobQueue.clear();
 		forceCPU = false;
 	}
 
@@ -58,10 +57,11 @@ namespace MElib {
 	}
 
 	void JobManager::ClearJob() {
-		for (auto job : jobQueue) {
-			delete job;
+		int size = jobQueue.size();
+		for (int i = 0; i < size; i++) {
+			delete jobQueue.front();
+			jobQueue.pop();
 		}
-		jobQueue.clear();
 	}
 
 	void JobManager::Update() {
@@ -69,7 +69,9 @@ namespace MElib {
 		float jbCPULoad = 0.0f;
 		float jbMELoad = 0.0f;
 
-		for (auto job : jobQueue) {
+		int size = jobQueue.size();
+		while (jobQueue.size() > 0) {
+			auto job = jobQueue.front();
 			//Execute job
 			isExecuting = true;
 
@@ -114,8 +116,9 @@ namespace MElib {
 			}
 
 			delete job;
+			jobQueue.pop();
 		}
-		
+
 
 		//Delay till the next frame
 		sceKernelDelayThread(16 * 1000);
@@ -128,6 +131,6 @@ namespace MElib {
 	}
 
 	void JobManager::AddJob(Job* job) {
-		jobQueue.push_back(job);
+		jobQueue.push(job);
 	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <queue>
 #include <pspkerneltypes.h>
 #include <map>
 #include <psptypes.h>
@@ -77,7 +77,7 @@ namespace MElib {
 		void ClearJob(); /** Clears and deletes all jobs */
 
 	private:
-		std::vector<Job*> jobQueue;	
+		std::queue<Job*> jobQueue;	
 		static int thread_update(SceSize args, void* argp);
 		void Update();
 
