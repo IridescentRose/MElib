@@ -7,14 +7,22 @@
 Job* queue[MAX_QUEUE_SIZE];
 int size = 0;
 
+bool listDone = false;
 
 void J_AddJob(Job* job) {
-	
+	if (size + 1 > MAX_QUEUE_SIZE) {
+		J_DispatchJobs();
+
+		while (!listDone) {}
+	}
+
+	queue[size++] = job;
 }
 
-void JobManager::ClearJob() {
+void J_ClearJob() {
 	for (int i = 0; i < size; i++) {
-		delete queue[i];
+		free(queue[i]);
+		queue[i] = NULL;
 	}
 	size = 0;
 }
@@ -43,7 +51,7 @@ u64 lastTick;
 int JI_ThreadUpdate(SceSize args, void* argp);
 
 
-void J_Init(ManagerInfo info) {
+void J_Init(bool dynamicRebalance) {
 	m_priority = false;
 	m_dynamic = false;
 	isExecuting = false;
@@ -72,15 +80,13 @@ void J_Init(ManagerInfo info) {
 
 	sceRtcGetCurrentTick(&lastTick);
 	tickResolution = sceRtcGetTickResolution();
-
-	m_priority = info.priorityQueue;
-	m_dynamic = info.dynamicRebalancing;
+	m_dynamic = dynamicRebalance;
 }
 
 void J_Cleanup() {
 	KillME(mei);
 	sceKernelTerminateDeleteThread(thread_id);
-	ClearJob();
+	J_ClearJob();
 }
 
 
@@ -90,9 +96,10 @@ void J_Update() {
 	float jbCPULoad = 0.0f;
 	float jbMELoad = 0.0f;
 
-	int size = jobQueue.size();
-	while (jobQueue.size() > 0) {
-		auto job = jobQueue.front();
+	listDone = false;
+
+	for(int i = 0; i < size; i++){
+		Job* job = queue[i];
 		//Execute job
 		isExecuting = true;
 
@@ -136,17 +143,18 @@ void J_Update() {
 			}
 		}
 
-		delete job;
-		jobQueue.pop();
+		free(job);
+		queue[i] = NULL;
 	}
-
+	size = 0;
+	listDone = true;
 
 	//Delay till the next frame
 	sceKernelDelayThread(16 * 1000);
 }
 
 void J_DispatchJobs() {
-	sceKernelStartThread(thread_id, NULL, NULL);
+	sceKernelStartThread(thread_id, 0, NULL);
 }
 
 int JI_thread_update(SceSize args, void* argp) {

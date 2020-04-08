@@ -28,19 +28,7 @@
 typedef struct  {
 	unsigned char id; /** This ID is used for tracking performance and dynamic rebalancing. Use one id per different job */
 	unsigned char execMode; /** Uses execution mode to specify where the code will run and/or if said code can be dynamically rebalanced */
-	unsigned char priority; /** States priority of the job */
-	bool ignorePriority; /** Forces the code to run */
 } JobInfo;
-
-/**
-* This structure is used to determine the execution structure of the jobs.
-* Given the properties in this structure, the manager will execute accordingly.
-*/
-typedef struct {
-	bool priorityQueue; /** This setting determines whether or not the JobManager will prioritize higher priority or lower priority tasks */
-	bool dynamicRebalancing; /** This setting determines whether or not the JobManager will try to balance system load */
-} ManagerInfo;
-
 
 struct Job;
 
@@ -67,7 +55,7 @@ typedef struct {
 * JobManager class. This class only can have one instance for the ME.
 */
 
-void J_Init(ManagerInfo info); /** Initialize the job manager with the ManagerInfo */
+void J_Init(bool dynamicRebalance); /** Initialize the job manager with the option to dynamically rebalance loads. */
 void J_Cleanup(); /** Cleans up and ends execution */
 
 void J_AddJob(Job* job); /** Adds a job to the queue */
