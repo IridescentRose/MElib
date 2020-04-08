@@ -6,6 +6,12 @@ This library is intended to allow users to custom define code with a Job Manager
 
 ## How to use the Media Engine Library
 
-Currently it reflects the Daedalus Driver only, *but this will change soon*. More features will be added allowing easier use of the Media Engine. To use it, make sure the `mediaengine.prx` file is in your directory with the `EBOOT.PBP`. Next, add the includes and libraries to your project. Finally, make sure you link with `-lme`
+Currently, the Media Engine library defines a Job structure which contains a basic Job information struct, a reference to a function, and an integer pointer to the data used by said function. Jobs are passed into the global Job manager and can be dispatched at any time.
 
-Currently there is no documentation, but there will be documentation for the full job manager system.
+To use it: 
+* Add the includes and libraries to your project structure.
+* Link with `-lme`
+* Make sure `mediaengine.prx` (found in bin) is in your EBOOT directory.
+
+Currently there is documentation in the header file which explains the system.
+I have also included a very basic sample use case.
