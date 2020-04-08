@@ -1,4 +1,9 @@
 #pragma once
+
+#ifdef __cplusplus  
+extern "C" {
+#endif 
+
 #include <time.h>
 #include <stdbool.h>
 #include <pspkerneltypes.h>
@@ -54,3 +59,8 @@ void J_AddJob(struct Job* job); /** Adds a job to the queue. If the queue is ful
 void J_ClearJob(); /** Clears and deletes all jobs */
 
 void J_DispatchJobs(); /** Starts a thread to dispatch jobs and execute! */
+
+
+#ifdef __cplusplus  
+}
+#endif 
