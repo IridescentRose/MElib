@@ -5,6 +5,7 @@ src/melib.o \
 
 alib = lib/libME.a
 
+CFLAGS = -G0 -O3
 INCDIR = $(PSPPATH)/include
 INCDIR += ./include ./libs/include
 ASFLAGS = $(CFLAGS)
