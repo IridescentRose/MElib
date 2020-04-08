@@ -1,15 +1,16 @@
 #include <melib.h>
 #include <driver/me.h>
 #include <malloc.h>
+#include <stdio.h>
 #include <pspkernel.h>
 
 #define MAX_QUEUE_SIZE 256
-Job* queue[MAX_QUEUE_SIZE];
+struct Job* queue[MAX_QUEUE_SIZE];
 int size = 0;
 
 bool listDone = false;
 
-void J_AddJob(Job* job) {
+void J_AddJob(struct Job* job) {
 	if (size + 1 > MAX_QUEUE_SIZE) {
 		J_DispatchJobs();
 
@@ -29,7 +30,7 @@ void J_ClearJob() {
 
 struct me_struct* mei;
 
-inline void* malloc_64(int size)
+void* malloc_64(int size)
 {
 	int mod_64 = size & 0x3f;
 	if (mod_64 != 0) size += 64 - mod_64;
@@ -62,6 +63,9 @@ void J_Init(bool dynamicRebalance) {
 
 	if (ret < 0) {
 		forceCPU = true;
+	}
+	else {
+		printf("ME Module Loaded\n");
 	}
 
 	mei = (volatile struct me_struct*)malloc_64(sizeof(struct me_struct));
@@ -98,8 +102,9 @@ void J_Update() {
 
 	listDone = false;
 
+	printf("Dispatch Size: %d\n", size);
 	for(int i = 0; i < size; i++){
-		Job* job = queue[i];
+		struct Job* job = queue[i];
 		//Execute job
 		isExecuting = true;
 
@@ -119,6 +124,7 @@ void J_Update() {
 
 
 		if (job->jobInfo.execMode == MELIB_EXEC_CPU || forceCPU) {
+
 			job->function(job->data);
 			sceKernelDelayThread(400); //Give a "breather" time
 		}
@@ -126,6 +132,8 @@ void J_Update() {
 			BeginME(mei, (int)job->function, (int)job->data, -1, NULL, -1, NULL);
 			while(!CheckME(mei))
 				sceKernelDelayThread(100); //Poll for it
+
+			sceKernelDcacheWritebackInvalidateAll();
 		}
 
 		//Done
@@ -157,6 +165,6 @@ void J_DispatchJobs() {
 	sceKernelStartThread(thread_id, 0, NULL);
 }
 
-int JI_thread_update(SceSize args, void* argp) {
+int JI_ThreadUpdate(SceSize args, void* argp) {
 	J_Update();
 }

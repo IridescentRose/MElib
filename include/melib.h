@@ -12,23 +12,15 @@
 #define MELIB_EXEC_CPU		0x1 /**  Executes specifically on the main CPU, regardless of job mode. Always runs synchronously (gives a small delay between jobs).*/
 #define MELIB_EXEC_ME		0x2 /** Executes specifically on the Media Engine, regardless of job mode. Always runs asynchronously.*/
 
-/**
-* Importance of the job.
-*/
-#define MELIB_PRIORITY_NONE 0x0 /** No priority. Equivalent to medium when priority queue is enabled */
-#define MELIB_PRIORITY_LOW	0x1 /** Low priority */
-#define MELIB_PRIORITY_MED	0x2 /** Medium priority */
-#define MELIB_PRIORITY_HIGH	0x4 /** High priority */
-
 
 /**
 * This structure is used to determine job execution.
 * Given the properties in this structure, the manager will execute correctly
 */
-typedef struct  {
+struct JobInfo {
 	unsigned char id; /** This ID is purely useless for now - but may be used in the future for performance tracking */
 	unsigned char execMode; /** Uses execution mode to specify where the code will run and/or if said code can be dynamically rebalanced */
-} JobInfo;
+};
 
 struct Job;
 
@@ -45,11 +37,11 @@ typedef int (*JobFunction)(JobData ptr);
 /**
 * This structure is used to give job information alongside the job itself and the data needed.
 */
-typedef struct {
-	JobInfo jobInfo;
+struct Job {
+	struct JobInfo jobInfo;
 	JobFunction function;
 	JobData data;
-}Job;
+};
 
 /** 
 * JobManager class. This class only can have one instance for the ME.
@@ -58,7 +50,7 @@ typedef struct {
 void J_Init(bool dynamicRebalance); /** Initialize the job manager with the option to dynamically rebalance loads. */
 void J_Cleanup(); /** Cleans up and ends execution. */
 
-void J_AddJob(Job* job); /** Adds a job to the queue. If the queue is full (max 256) then it will force a dispatch before adding more. */
+void J_AddJob(struct Job* job); /** Adds a job to the queue. If the queue is full (max 256) then it will force a dispatch before adding more. */
 void J_ClearJob(); /** Clears and deletes all jobs */
 
 void J_DispatchJobs(); /** Starts a thread to dispatch jobs and execute! */
