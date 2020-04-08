@@ -26,7 +26,7 @@
 * Given the properties in this structure, the manager will execute correctly
 */
 typedef struct  {
-	unsigned char id; /** This ID is used for tracking performance and dynamic rebalancing. Use one id per different job */
+	unsigned char id; /** This ID is purely useless for now - but may be used in the future for performance tracking */
 	unsigned char execMode; /** Uses execution mode to specify where the code will run and/or if said code can be dynamically rebalanced */
 } JobInfo;
 
@@ -56,9 +56,9 @@ typedef struct {
 */
 
 void J_Init(bool dynamicRebalance); /** Initialize the job manager with the option to dynamically rebalance loads. */
-void J_Cleanup(); /** Cleans up and ends execution */
+void J_Cleanup(); /** Cleans up and ends execution. */
 
-void J_AddJob(Job* job); /** Adds a job to the queue */
+void J_AddJob(Job* job); /** Adds a job to the queue. If the queue is full (max 256) then it will force a dispatch before adding more. */
 void J_ClearJob(); /** Clears and deletes all jobs */
 
-void J_DispatchJobs();
+void J_DispatchJobs(); /** Starts a thread to dispatch jobs and execute! */
