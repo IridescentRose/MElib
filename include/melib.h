@@ -58,7 +58,7 @@ void J_Cleanup(); /** Cleans up and ends execution. */
 void J_AddJob(struct Job* job); /** Adds a job to the queue. If the queue is full (max 256) then it will force a dispatch before adding more. */
 void J_ClearJob(); /** Clears and deletes all jobs */
 
-void J_DispatchJobs(); /** Starts a thread to dispatch jobs and execute! */
+void J_DispatchJobs(float cpuTime); /** Starts a thread to dispatch jobs and execute! CPU Time is the time used by the rest of the system for Dynamic Rebalancing - it's unused otherwise. */
 
 
 #ifdef __cplusplus  

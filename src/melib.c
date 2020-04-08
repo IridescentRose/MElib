@@ -9,10 +9,11 @@ struct Job* queue[MAX_QUEUE_SIZE];
 int size = 0;
 
 bool listDone = false;
+float cpuTime = 0.0f;
 
 void J_AddJob(struct Job* job) {
 	if (size + 1 > MAX_QUEUE_SIZE) {
-		J_DispatchJobs();
+		J_DispatchJobs(cpuTime);
 
 		while (!listDone) {}
 	}
@@ -95,9 +96,9 @@ void J_Cleanup() {
 
 
 
-void J_Update() {
+void J_Update(float cpuTime) {
 
-	float jbCPULoad = 0.0f;
+	float jbCPULoad = cpuTime;
 	float jbMELoad = 0.0f;
 
 	listDone = false;
@@ -161,10 +162,11 @@ void J_Update() {
 	sceKernelDelayThread(16 * 1000);
 }
 
-void J_DispatchJobs() {
+void J_DispatchJobs(float cpu) {
+	cpuTime = cpu;
 	sceKernelStartThread(thread_id, 0, NULL);
 }
 
 int JI_ThreadUpdate(SceSize args, void* argp) {
-	J_Update();
+	J_Update(cpuTime);
 }
