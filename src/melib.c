@@ -162,10 +162,6 @@ void J_Update(float cpuTime) {
 	jbMELoadLast = jbMELoad;
 
 	listDone = true;
-
-
-	//Delay till the next frame
-	sceKernelDelayThread(16 * 1000);
 }
 
 void J_DispatchJobs(float cpu) {
