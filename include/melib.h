@@ -60,6 +60,8 @@ void J_ClearJob(); /** Clears and deletes all jobs */
 
 void J_DispatchJobs(float cpuTime); /** Starts a thread to dispatch jobs and execute! CPU Time is the time used by the rest of the system for Dynamic Rebalancing - it's unused otherwise. */
 
+float J_GetMETime();
+float J_GetCPUTime();
 
 #ifdef __cplusplus  
 }

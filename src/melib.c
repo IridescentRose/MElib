@@ -94,11 +94,12 @@ void J_Cleanup() {
 	J_ClearJob();
 }
 
-
+float jbCPULoadLast = 0.0f;
+float jbMELoadLast = 0.0f;
 
 void J_Update(float cpuTime) {
 
-	float jbCPULoad = cpuTime;
+	float jbCPULoad = 0.0f;
 	float jbMELoad = 0.0f;
 
 	listDone = false;
@@ -109,12 +110,14 @@ void J_Update(float cpuTime) {
 		//Execute job
 		isExecuting = true;
 
+
 		int endMode = job->jobInfo.execMode;
+		sceRtcGetCurrentTick(&lastTick);
+
 		if (m_dynamic && !forceCPU) {
-			sceRtcGetCurrentTick(&lastTick);
 
 			if (endMode == MELIB_EXEC_DEFAULT) {
-				if (jbCPULoad >= jbMELoad) {
+				if (jbCPULoad + cpuTime >= jbMELoad) {
 					endMode = MELIB_EXEC_ME;
 				}
 				else {
@@ -140,23 +143,26 @@ void J_Update(float cpuTime) {
 		//Done
 		isExecuting = false;
 
-		if (m_dynamic && !forceCPU) {
-			u64 temp = lastTick;
-			sceRtcGetCurrentTick(&lastTick);
-			float dt = (double)(lastTick - temp) / ((double)tickResolution);
-			if (endMode == MELIB_EXEC_CPU) {
-				jbCPULoad += dt;
-			}
-			else {
-				jbMELoad += dt;
-			}
+		u64 temp = lastTick;
+		sceRtcGetCurrentTick(&lastTick);
+		float dt = (double)(lastTick - temp) / ((double)tickResolution);
+		if (endMode == MELIB_EXEC_CPU) {
+			jbCPULoad += dt;
+		}
+		else {
+			jbMELoad += dt;
 		}
 
 		free(job);
 		queue[i] = NULL;
 	}
 	size = 0;
+
+	jbCPULoadLast = jbCPULoad;
+	jbMELoadLast = jbMELoad;
+
 	listDone = true;
+
 
 	//Delay till the next frame
 	sceKernelDelayThread(16 * 1000);
@@ -169,4 +175,12 @@ void J_DispatchJobs(float cpu) {
 
 int JI_ThreadUpdate(SceSize args, void* argp) {
 	J_Update(cpuTime);
+}
+
+
+float J_GetMETime() {
+	return jbMELoadLast;
+}
+float J_GetCPUTime() {
+	return jbCPULoadLast;
 }
