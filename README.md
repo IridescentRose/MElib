@@ -6,7 +6,7 @@ This library is intended to allow users to custom define code with a Job Manager
 
 ## How to use the Media Engine Library
 
-Currently, the Media Engine library defines a Job structure which contains a basic Job information struct, a reference to a function, and an integer pointer to the data used by said function. Jobs are passed into the global Job manager and can be dispatched at any time.
+Currently, the Media Engine library defines a Job structure which contains a basic Job information struct, a reference to a function, and an integer pointer to the data used by said function. Jobs are passed into the global Job manager and can be dispatched at any time. The Job Manager also can report statistics on what the ME and CPU load were.
 
 To use it: 
 * Add the includes and libraries to your project structure.
