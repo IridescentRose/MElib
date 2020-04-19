@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <pspkernel.h>
 
-#define MAX_QUEUE_SIZE 256
+#define MAX_QUEUE_SIZE 512
 struct Job* queue[MAX_QUEUE_SIZE];
 int size = 0;
 
