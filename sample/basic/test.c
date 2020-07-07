@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
 		struct Job* j = (struct Job*)malloc(sizeof(struct Job));
 		j->jobInfo.id = 1;
-		j->jobInfo.execMode = MELIB_EXEC_CPU;
+		j->jobInfo.execMode = MELIB_EXEC_ME;
 
 		j->function = &addFunc;
 		j->data = (int)&myInt;

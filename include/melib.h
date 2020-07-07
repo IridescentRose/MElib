@@ -8,6 +8,7 @@ extern "C" {
 #include <stdbool.h>
 #include <pspkerneltypes.h>
 #include <psptypes.h>
+#include <driver/me.h>
 #include <psprtc.h>
 
 /**
@@ -59,9 +60,12 @@ void J_AddJob(struct Job* job); /** Adds a job to the queue. If the queue is ful
 void J_ClearJob(); /** Clears and deletes all jobs */
 
 void J_DispatchJobs(float cpuTime); /** Starts a thread to dispatch jobs and execute! CPU Time is the time used by the rest of the system for Dynamic Rebalancing - it's unused otherwise. */
+void J_Update(float cpuTime); /** Dispatches and runs jobs on this thread. See above for CPU Time */
 
 float J_GetMETime();
 float J_GetCPUTime();
+
+struct me_struct* mei;
 
 #ifdef __cplusplus  
 }

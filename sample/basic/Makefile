@@ -1,12 +1,12 @@
 TARGET = MElibTest
 OBJS = test.o
 
-INCDIR = ../include
+INCDIR = ../../include
 CFLAGS = -G0 -Wall -O2
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 
-LIBDIR = ../lib
+LIBDIR = ../../lib
 LDFLAGS = 
 LIBS= -lme -lpsprtc -lpspsdk
 

@@ -133,11 +133,15 @@ void J_Update(float cpuTime) {
 			sceKernelDelayThread(400); //Give a "breather" time
 		}
 		else {
+			sceKernelDcacheWritebackInvalidateAll();
 			BeginME(mei, (int)job->function, (int)job->data, -1, NULL, -1, NULL);
-			while(!CheckME(mei))
+			while(!mei->done){
 				sceKernelDelayThread(100); //Poll for it
+			}
 
 			sceKernelDcacheWritebackInvalidateAll();
+
+			printf("Return Res: %d\n", mei->result);
 		}
 
 		//Done
