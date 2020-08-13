@@ -104,7 +104,6 @@ void J_Update(float cpuTime) {
 
 	listDone = false;
 
-	printf("Dispatch Size: %d\n", size);
 	for(int i = 0; i < size; i++){
 		struct Job* job = queue[i];
 		//Execute job
@@ -140,8 +139,6 @@ void J_Update(float cpuTime) {
 			}
 
 			sceKernelDcacheWritebackInvalidateAll();
-
-			printf("Return Res: %d\n", mei->result);
 		}
 
 		//Done

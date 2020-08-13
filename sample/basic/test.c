@@ -9,12 +9,12 @@ PSP_MODULE_INFO("MELIB TEST", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_VFPU | THREAD_ATTR_USER);
 PSP_HEAP_SIZE_KB(-1024);
 
+
+int myInt = 77;
 int addFunc(JobData data) {
-	int* i = (int*)data;
+	myInt++;
 
-	(*i)++;
-
-	return *i; //Result doesn't matter
+	return 0; //Result doesn't matter
 }
 
 int main(int argc, char* argv[])
@@ -23,7 +23,6 @@ int main(int argc, char* argv[])
 
 	J_Init(false);
 
-	int myInt = 77;
 
 	while (1)
 	{
